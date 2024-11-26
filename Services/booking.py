@@ -70,9 +70,9 @@ async def availability_calendar(request:Request,response:Response,start:str,end:
         return JSONResponse(content=error_response(str(error)),status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-def validate_booking_request(db,data):
+async def validate_booking_request(db,data):
     master_data  = db["MASTER"]
-    room_info = master_data.find_one({"entity":"ROOM_TYPE","props.name":data["room_type"]})
+    room_info = await master_data.find_one({"entity":"ROOM_TYPE","props.name":data["room_type"]})
     if not check_date_fmt(data["check_in"]) or not check_date_fmt(data["check_out"]):
         return False,JSONResponse(error_response(message="Invalid date format"),status_code=status.HTTP_400_BAD_REQUEST)
     if data["check_in"] > data["check_out"]:
@@ -96,7 +96,7 @@ def validate_booking_request(db,data):
 @app.post(_PATH_PREFIX + "/booking-request",tags=["Bookings"])
 async def request_booking(request:Request,response:Response,jData : BookingRequestRequest,user=Depends(get_current_user(scopes="login"))):
     data = jData.model_dump()
-    valid,error = validate_booking_request(request.app.mongodb,data)
+    valid,error = await validate_booking_request(request.app.mongodb,data)
     if not valid:
         return error
     results,error = await booking_request(data,user,request.app.mongodb)

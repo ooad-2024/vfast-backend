@@ -77,7 +77,7 @@ async def booking_request(data,user,db):
         if data["pax"] > MAX_ALLOWED_PERSONS:
             return None,JSONResponse(status_code=status.HTTP_400_BAD_REQUEST,content=error_response(message="Online booking is limited to 4 persons"))
         master_data = db["MASTER"]
-        room_info = master_data.find_one({"entity": "ROOM_TYPE", "props.name": data["room_type"]})
+        room_info = await master_data.find_one({"entity": "ROOM_TYPE", "props.name": data["room_type"]})
         rooms_required = math.ceil(data["pax"]/int(room_info["props"]["capacity"]))
         pipeline = get_booking_check_pipeline(data["check_in"],data["check_out"],data["room_type"],rooms_required)
         rooms = db["Room"]
