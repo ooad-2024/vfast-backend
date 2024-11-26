@@ -72,7 +72,7 @@ async def availability_calendar(request:Request,response:Response,start:str,end:
 
 async def validate_booking_request(db,data):
     master_data  = db["MASTER"]
-    room_info = await master_data.find_one({"entity":"ROOM_TYPE","props.name":data["room_type"]})
+    room_info = await master_data.find_one({"entity":"ROOM_TYPE","properties.name":data["room_type"]})
     if not check_date_fmt(data["check_in"]) or not check_date_fmt(data["check_out"]):
         return False,JSONResponse(error_response(message="Invalid date format"),status_code=status.HTTP_400_BAD_REQUEST)
     if data["check_in"] > data["check_out"]:

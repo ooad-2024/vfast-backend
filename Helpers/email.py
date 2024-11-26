@@ -99,7 +99,7 @@ def send_email_smtp(to, subject, body):
     smtp_server = "smtp.gmail.com"
     smtp_port = 587
     email_address = "h20240187@pilani.bits-pilani.ac.in"
-    email_password = "toyk qsnb chsb pfyz"
+    email_password = ""
 
     try:
         message = MIMEMultipart()

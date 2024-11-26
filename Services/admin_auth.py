@@ -59,9 +59,10 @@ async def verify_otp(request: Request, response: Response, jData: VerifyOtpReque
 async def g_auth(request: Request, response: Response, token: str):
     try:
         response, error = await gauth_login_helper(token, request.app.mongodb,role=ROLES.ADMINS)
+        data = {"access_token": response}
         if error:
             return error
-        return JSONResponse(content=success_response(message="Success"), status_code=status.HTTP_200_OK)
+        return JSONResponse(content=success_response(message="Success",data=data), status_code=status.HTTP_200_OK)
     except Exception as error:
         return JSONResponse(content=error, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
