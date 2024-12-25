@@ -133,4 +133,3 @@ def sendBookingConfirmation(to,vars,status="success"):
 
     error = send_email_smtp(to, "Booking Status - VFAST Hostel", HTML)
     return error
-

@@ -21,9 +21,13 @@ class BookingRequestRequest(BaseModel):
     check_out : str
     room_type : Literal["Standard","Deluxe","Suite","Royal Suite","Dormitory"]
     pax : int
-
+class Room(BaseModel):
+    id :str
+    room_number :str
+    type :str
 class ConfirmBookingRequest(BaseModel):
     status : str
+    rooms : List[Room]
     reason : Optional[str] = None
     booking_id : str
     status_reason : Optional[str] = None
@@ -110,8 +114,8 @@ async def request_booking(request:Request,response:Response,jData : BookingReque
 
 @app.post(_PATH_PREFIX + "/confirm-booking",tags=["Bookings"])
 async def booking_confirmation(request:Request,response:Response,jData : ConfirmBookingRequest,user=Depends(get_current_user(scopes="login",roles=ROLES.ADMINS))):
-    # data = jData.model_dump()
-    error = await confirm_booking(jData.booking_id,jData.status,user,request.app.mongodb,reason=jData.reason)
+    data = jData.model_dump()
+    error = await confirm_booking(jData.booking_id,jData.status,user,request.app.mongodb,reason=jData.reason,rooms_alloted = data["rooms"])
 
     if error:
         return error

@@ -472,3 +472,69 @@ def get_all_room_status_pipeline(req_date):
         }
     }
     ]
+
+
+def get_rooms_pipeline(type,check_in,check_out):
+    return [
+    {
+        '$match': {
+            'room_type': type
+        }
+    }, {
+        '$addFields': {
+            'check_in': check_in,
+            'check_out': check_out
+        }
+    }, {
+        '$addFields': {
+            'fltrd_bookings': {
+                '$filter': {
+                    'input': '$bookings',
+                    'as': 'res',
+                    'cond': {
+                        '$or': [
+                            {
+                                '$and': [
+                                    {
+                                        '$gte': [
+                                            '$check_in', '$$res.check_in'
+                                        ]
+                                    }, {
+                                        '$lte': [
+                                            '$check_in', '$$res.check_out'
+                                        ]
+                                    }
+                                ]
+                            }, {
+                                '$and': [
+                                    {
+                                        '$gte': [
+                                            '$check_out', '$$res.check_in'
+                                        ]
+                                    }, {
+                                        '$lte': [
+                                            '$check_out', '$$res.check_out'
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    }, {
+        '$match': {
+            'fltrd_bookings': {
+                '$eq': []
+            }
+        }
+    }, {
+        '$project': {
+            '_id': {"$toString":"$_id"},
+            'room_number': 1,
+            'room_type': 1
+        }
+    }
+
+]

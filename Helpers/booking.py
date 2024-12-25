@@ -10,7 +10,7 @@ from Importers.common_imports import *
 from Importers.common_functions import *
 from Config.models import *
 from Helpers.mongo import get_check_availability_pipeline, get_booking_check_pipeline, get_bookings_dashboard_pipeline, \
-    get_booking_statistics_pipeline, get_requests_dashboard_pipeline
+    get_booking_statistics_pipeline, get_requests_dashboard_pipeline,get_user_bookings_pipeline
 
 
 # def insert_room():
@@ -109,7 +109,7 @@ async def booking_request(data,user,db):
                         "email":data["email"],
                         "phone_number":data["phone_number"],
                         "booked_user_id":ObjectId(user["id"]),
-                        "booked_room_id":result.get("rooms"),
+                        "booked_room_id":[],
                         "booked_room_type":data["room_type"],
                         "booking_status":BOOKING_STATUS.PENDING.value,
                         "purpose_of_visit":data["purpose_of_visit"],
@@ -131,7 +131,7 @@ async def booking_request(data,user,db):
 
 
 
-async def confirm_booking(booking_id,status,user,db,reason=None):
+async def confirm_booking(booking_id,status,user,db,reason=None,rooms_alloted= None):
     rooms = db["Room"]
     bookings = db["Bookings"]
     users = db["Users"]
@@ -140,8 +140,10 @@ async def confirm_booking(booking_id,status,user,db,reason=None):
     user_info = await users.find_one({"_id": ObjectId(booking_info["booked_user_id"])})
     if status == "accept":
         booking_status = BOOKING_STATUS.RESERVED.value
-        await bookings.update_one({"_id":ObjectId(booking_id)},{"$set":{"booking_status":booking_status,"status_change_ts":get_timestamp()}})
-        rooms_booked = booking_info["booked_room_id"]
+        for alloted in rooms_alloted:
+            alloted["_id"] = ObjectId(alloted.pop("id"))
+        await bookings.update_one({"_id":ObjectId(booking_id)},{"$set":{"booking_status":booking_status,"status_change_ts":get_timestamp(),"booked_room_id":rooms_alloted}})
+        rooms_booked = rooms_alloted
 
         for room in rooms_booked:
             existing = await bookings.find_one({"$and":[{"_id":room["_id"]},{"bookings.booking_id":ObjectId(booking_id)}]})
@@ -173,7 +175,7 @@ async def get_bookings_dashboard_helper(req_date,user,db):
             results.append(result)
         return results, None
     except Exception as error:
-        return None,error
+        return None,JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,content=error_response(message=str(error)))
 
 
 async def get_dashboard_statistics(user,req_date,db):
@@ -193,7 +195,7 @@ async def get_dashboard_statistics(user,req_date,db):
         "today_completed_checkouts": 0
     },None
     except Exception as error:
-        return None, error
+        return None, JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,content=error_response(message=str(error)))
 
 async def get_dashboard_requests(user,req_date,db):
     try:
@@ -204,19 +206,20 @@ async def get_dashboard_requests(user,req_date,db):
             results.append(result)
         return results, None
     except Exception as error:
-        return None, error
+        return None, JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,content=error_response(message=str(error)))
 
 
 async def get_user_bookings(user,db):
     try:
         bookings = db["Bookings"]
-        pipe = get_bookings_dashboard_pipeline(user)
+        pipe = get_user_bookings_pipeline(user)
         results = []
         async for result in bookings.aggregate(pipeline=pipe):
+            result["_id"] = str(result["_id"])
             results.append(result)
         return results, None
     except Exception as error:
-        return None, error
+        return None, JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,content=error_response(message=str(error)))
 
 
 async def booking_action_helper(booking_id,status,user,db):
@@ -241,5 +244,5 @@ async def booking_action_helper(booking_id,status,user,db):
             for room in rooms_booked:
                 await rooms.update_one({"_id":room["_id"]}, {"status":"Available","status_change_ts":get_timestamp()})
     except Exception as error:
-        return error
+        return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,content=error_response(message=str(error)))
 
