@@ -41,10 +41,10 @@ async def get_room_type_dd(db):
     try:
         master = db["MASTER"]
         pipe = await get_room_type_dd_pipeline()
-        print(pipe)
         results = []
         async for result in master.aggregate(pipeline=pipe):
             results.append(result)
         return results,None
     except Exception as error:
         return None,JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,content=error_response(message=str(error)))
+
