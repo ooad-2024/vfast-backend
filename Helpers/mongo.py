@@ -531,9 +531,10 @@ def get_rooms_pipeline(type,check_in,check_out):
         }
     }, {
         '$project': {
-            '_id': {"$toString":"$_id"},
+            "_id":0,
+            'id': {"$toString":"$_id"},
             'room_number': 1,
-            'room_type': 1
+            'type': "$room_type"
         }
     }
 

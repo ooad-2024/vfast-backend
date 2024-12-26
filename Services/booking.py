@@ -21,10 +21,14 @@ class BookingRequestRequest(BaseModel):
     check_out : str
     room_type : Literal["Standard","Deluxe","Suite","Royal Suite","Dormitory"]
     pax : int
+
+
 class Room(BaseModel):
     id :str
     room_number :str
     type :str
+
+
 class ConfirmBookingRequest(BaseModel):
     status : str
     rooms : List[Room]
