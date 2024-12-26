@@ -538,3 +538,10 @@ def get_rooms_pipeline(type,check_in,check_out):
     }
 
 ]
+
+
+async def get_room_type_dd_pipeline():
+    return [
+        {"$match":{"entity":"ROOM_TYPE"}},
+        {"$project":{"_id": 0,"type":"$properties.name"}}
+    ]

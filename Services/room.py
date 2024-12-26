@@ -23,6 +23,7 @@ async def all_rooms_status(request:Request,response:Response,req_date : str=None
     else:
         response_data = {"rooms": data}
         return JSONResponse(content=success_response(message="Rooms Fetched",data=response_data),status_code=status.HTTP_200_OK)
+
 @app.post(_PATH_PREFIX + "/available-rooms",tags=["Rooms"])
 async def get_available_rooms(request:Request,response:Response,jData :  GetRoomsRequest):
     try:
@@ -35,3 +36,13 @@ async def get_available_rooms(request:Request,response:Response,jData :  GetRoom
 
 
 
+@app.get(_PATH_PREFIX + "/room-types",tags=["Rooms"])
+async def get_room_dd(request:Request,response:Response):
+
+    data,error = await get_room_type_dd(request.app.mongodb)
+    if error:
+        return error
+
+    else:
+        response_data = {"room_types": data}
+        return JSONResponse(content=success_response(message="Rooms Types Fetched",data=response_data),status_code=status.HTTP_200_OK)

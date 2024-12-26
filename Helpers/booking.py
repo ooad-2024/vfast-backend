@@ -19,7 +19,7 @@ from Helpers.mongo import get_check_availability_pipeline, get_booking_check_pip
 #         room = Room(room_number=str(room_no),room_type = "Executive",status="Available",capacity=2,bookings=[])
 #         room_json = room.model_dump()
 #         inserts.append(room_json)
-#     conn = pymongo.MongoClient("mongodb+srv://ooad-group:tIhDKwgRTG0ZLLYP@ooad-cluster.zffpm.mongodb.net/")
+#     conn = pymongo.MongoClient("")
 #     db = conn["vfast-client"]
 #     rooms = db["Room"]
 #     result = rooms.insert_many(inserts)
@@ -30,7 +30,7 @@ from Helpers.mongo import get_check_availability_pipeline, get_booking_check_pip
 #     room = RoomBookings(check_in="2024-10-29T12:00:00+0530",check_out="2024-10-30T10:00:00+0530",booked_user_id="670baab543739bce7e2f68cd",booking_id=get_uuid())
 #     room_json = room.model_dump()
 #
-#     conn = pymongo.MongoClient("mongodb+srv://ooad-group:tIhDKwgRTG0ZLLYP@ooad-cluster.zffpm.mongodb.net/")
+#     conn = pymongo.MongoClient("")
 #     db = conn["vfast-client"]
 #     rooms = db["Room"]
 #     result = rooms.update_one({"room_number":room_no}, {"$addToSet":{"bookings":room_json}})

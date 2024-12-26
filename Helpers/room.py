@@ -6,7 +6,7 @@ from Helpers.email import sendBookingConfirmation
 from Importers.common_imports import *
 from Importers.common_functions import *
 from Config.models import *
-from Helpers.mongo import get_all_room_status_pipeline, get_rooms_pipeline
+from Helpers.mongo import get_all_room_status_pipeline, get_rooms_pipeline,get_room_type_dd_pipeline
 
 
 async def get_rooms_status(req_date, db):
@@ -35,3 +35,16 @@ async def get_rooms(type, check_in, check_out, db):
 
     except Exception as error:
         return None, JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,content=error_response(message=str(error)))
+
+
+async def get_room_type_dd(db):
+    try:
+        master = db["MASTER"]
+        pipe = await get_room_type_dd_pipeline()
+        print(pipe)
+        results = []
+        async for result in master.aggregate(pipeline=pipe):
+            results.append(result)
+        return results,None
+    except Exception as error:
+        return None,JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,content=error_response(message=str(error)))
