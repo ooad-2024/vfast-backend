@@ -1,1 +1,1 @@
-web: uvicorn main:app --port $PORT --log-level "debug" --workers 4
+web: uvicorn main:app --port $PORT --log-level "debug"
