@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     MONGO_DB : str
     AWS_ACCESS_KEY: str
     AWS_SECRET_KEY: str
+    GOOGLE_CLIENT_ID: str
 
     class Config:
         env_file = ".env"

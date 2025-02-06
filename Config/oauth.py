@@ -32,10 +32,11 @@ def get_current_user(scopes=None,roles=None):
     return decode_jwt
 
 
-
 def verify_google_token(token):
     try:
-        CLIENT_ID = "855258357265-pl8s44g0hvdpmhcju8l0p2rapu8c536n.apps.googleusercontent.com"
+        # CLIENT_ID = "855258357265-pl8s44g0hvdpmhcju8l0p2rapu8c536n.apps.googleusercontent.com"
+        # CLIENT_ID = "464794475879-742k1rji25rb0bg25lp0cv0c9l5n1ljj.apps.googleusercontent.com"
+        CLIENT_ID = settings.GOOGLE_CLIENT_ID
 
         id_info = id_token.verify_oauth2_token(token, requests.Request(), CLIENT_ID)
 

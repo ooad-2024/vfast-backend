@@ -16,6 +16,8 @@ async def lifespan(app: FastAPI):
     app.mongodb = app.mongodb_client[settings.MONGO_DB]
     yield
     app.mongodb_client.close()
+    
+    
 app = FastAPI(title="VFAST Hotel Booking System",lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
